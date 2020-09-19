@@ -74,5 +74,8 @@ length((content(r)))
 
 c <- x %>% http()
 
+# feed this now back to windows; let's check if we see this comment there!
+# https://www.jcchouinard.com/add-a-file-to-github-with-git-bash/
+
 
 
