@@ -24,13 +24,14 @@ names(stock_lookup) <- c('Ticker', 'Company')
 
 
 for (stock in ticker_vector){
-   output <- av_get(symbol = stock, av_fun = 'TIME_SERIES_DAILY_ADJUSTED', outputsize = 'full')
-   output$Ticker <- stock
-   df <- data.frame(output)
-   df_total <- rbind(df_total, df)
-   Sys.sleep(15)
+  output <- av_get(symbol = stock, av_fun = 'TIME_SERIES_DAILY_ADJUSTED', outputsize = 'full')
+  output$Ticker <- stock
+  df <- data.frame(output)
+  df_total <- rbind(df_total, df)
+  Sys.sleep(15)
 }
 
 
 df <- merge(df_total, stock_lookup, by = 'Ticker')
 
+# trying to use gitbash on mac.  let's see if this change shows up on github.com version of this same R script.
