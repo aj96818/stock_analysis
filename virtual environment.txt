@@ -1,0 +1,17 @@
+To create virtual environment:
+
+virtualenv py_yfinance
+
+To activate virtual environment:
+
+cd into \Documents\Environments
+
+then type:
+
+C:\Users\aljackson\Documents\Environments\python_stocks_env\Scripts\activate.bat
+
+and hit 'enter'
+
+to exit out of virtual environment
+
+enter, "deactivate"
