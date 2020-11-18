@@ -5,10 +5,9 @@
 #pip install requests
 #pip install requests_html
 import pandas as pd
-
 from yahoo_fin.stock_info import get_data
 
-#import pandas.io.data as web
+
 
 tickers = ['NIO', 'LI']
 
@@ -31,67 +30,40 @@ for ticker in tickers:
         pass
 
 
+series_list = []
 
 for key in historical_data:
     for col_name in historical_data[key]:
-        for value in historical_data[key][col_name]:
-            print(historical_data[key])
-            
- 
+         series = historical_data[key][col_name]
+         series_list.append(series)
 
-print(historical_data['NIO']['open'])
+df_list = []
 
-
-
-
-
-# for x in historical_data:
-#     for y in historical_data[x]:
-#         print(len(y))
+for s in series_list:
+    s_df = s.to_frame()
+    df_list.append(s_df)
 
 
-
-
-# for i in historical_data.keys():
-#     for x in historical_data[i]:
-#         print("{} --- {}".format(i,x))
-
-
-
-
-# for key, value in historical_data.items():
-#      print(key, value)
+print(df_list[2])
 
 
 
 
 
 
-
-#print(historical_data.keys())
-
-#print(type(historical_data[].values()))
-
-#df = pd.DataFrame.from_dict(historical_data, orient = 'index', columns = ['value'])
 #df = pd.DataFrame([historical_data], columns = ['date', 'open', 'high', 'low', 'close', 'adjclose', 'volume', 'ticker'])
 
-#print([historical_data])
 
-#print(df)
+# --------- Initializing Python virtual environment on Windows 10 PC  ---------------- #
 
+# To create virtual environment:
+# virtualenv py_yfinance
+# To activate virtual environment:
 
-#print(str(historical_data.values()))
-#pdata = pd.Panel(dict((stk, web.get_data_yahoo(stk)) for stk in ['NIO', 'LI']))
-# print(pdata)
-# output = pd.DataFrame()
-# output = output.append(historical_data, ignore_index=True)
-# print(output.head())
-# for ticker in tickers:
-#     historical_data[ticker] = get_data(ticker)
-#df = pd.DataFrame(list(historical_data.items()), columns = ['open', 'high', 'low', 'close', 'adjclose', 'volume', 'ticker'])
-#nio = historical_data['NIO']
-#df = pd.DataFrame([historical_data], columns = historical_data.keys())
-#df_table = pd.concat([df_table, df], axis = 0).reset_index()
-#print(df)
-# amazon_weekly= get_data("amzn", start_date="12/04/2009", end_date="12/04/2019", index_as_date = True, interval="1wk")
-# print(amazon_weekly)
+# cd into \Documents\Environments
+# then type:
+# C:\Users\aljackson\Documents\Environments\py_yfinance\Scripts\activate.bat
+# and hit 'enter'
+# python yahoo_finance.py
+# to exit out of virtual environment
+# enter, "deactivate"
