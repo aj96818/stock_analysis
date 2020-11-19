@@ -4,6 +4,7 @@
 #pip install pandas
 #pip install requests
 #pip install requests_html
+
 import pandas as pd
 from yahoo_fin.stock_info import get_data
 
@@ -37,6 +38,7 @@ for key in historical_data:
          series = historical_data[key][col_name]
          series_list.append(series)
 
+
 df_list = []
 
 for s in series_list:
@@ -44,10 +46,26 @@ for s in series_list:
     df_list.append(s_df)
 
 
-print(df_list[2])
+df_merge = df_list[0]
+
+for lst in df_list[1:7]:
+    df_merge = df_merge.merge(lst, left_index = True, right_index = True)
 
 
 
+
+
+#df1 = df_list[0]
+#df2 = df_list[1]
+
+#df_merge = df1.merge(df2, left_index = True, right_index = True)
+
+
+print(df_merge)
+
+#for col in df_list:
+   
+#range(0, 7)
 
 
 
@@ -60,10 +78,11 @@ print(df_list[2])
 # virtualenv py_yfinance
 # To activate virtual environment:
 
-# cd into \Documents\Environments
+# cd into \Documents\Environments\py_yfinance
 # then type:
 # C:\Users\aljackson\Documents\Environments\py_yfinance\Scripts\activate.bat
 # and hit 'enter'
+
 # python yahoo_finance.py
 # to exit out of virtual environment
 # enter, "deactivate"
