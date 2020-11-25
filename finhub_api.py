@@ -18,34 +18,18 @@ import json
 # Setup client
 finnhub_client = finnhub.Client(api_key='buugqr748v6rvcd72r80')
 
+tickers = ['SNE','TAP','SNOW','F','R','NOW','TTD','ADBE','DDOG','FSLY','RAMP','DEM','WIX','SEDG','A','ETSY','PINS','FVRR','AAPN','LI','LYFT','UBER','DFS','DGS','HD','LUV','DIA','CRM','AMD','SNAP','TWTR','NVDA','FB','AAPL','SPLK', 'TWLO', 'AMZN', 'MSFT', 'NFLX', 'NIO', 'WKHS', 'NKLA', 'PRTK', 'EIGR', 'ATRA', 'VKTX', 'VXRT', 'JNJ', 'NVAX', 'AZN', 'INO', 'MRNA', 'TTNP', 'BA', 'SNOW', 'FSLR', 'JOBS', 'APPS', 'SRNE', 'OM', 'CRNC', 'CDLX', 'EBON', 'ATEX']
+#tickers = ['SNE','TAP','SNOW','F']
+companies = ['Sony','Molsen Coors Beverage', 'Snowflake','Ford','Ryder','ServiceNow','Trade Desk','Adobe','DataDog','Fastly','LiveRamp','WisdomTree Emerging Markets High Dividend ETF','Wix','SolarEdge','Agilent','Etsy','Pinterest','Fiverr International','Appian','Li Auto','LYFT','Uber','Discover','WisdomTree Emerging Markets SmallCap Dividend ETF','Home Depot','Southwest Airlines','SPDR Dow Jones Industrial Avg ETF','Salesforce','AMD','Snapchat','Twitter','Nvidia','Facebook','Apple','Splunk','Twilio', 'Amazon', 'Microsoft', 'Netflix', 'Nio (Electric Car)', 'Workhorse Group Inc', 'Nikola Corp',           'Paratek Pharma', 'Eiger Biopharm', 'Atara biotherapeutics', 'Viking Therapeutics', 'Vaxart Pharma', 'Johnson&Johnson', 'Novavax Pharm', 'AstraZeneca Pharm', 'Inovio Pharma', 'Moderna Pharma', 'Titan Pharma', 'Boeing', 'Snowflake', 'First Solar', '51job', 'Digital Turbine', 'Sorento Therapeutics', 'Outset Medical', 'Cerence', 'Cardlytics', 'Ebang', 'Anterix']
 
-dictionary = finnhub_client.company_basic_financials('DDOG', 'margin')
+df_list = []
+for ticker in tickers:
+    try:
+        data = finnhub_client.company_earnings(symbol = ticker)
+        df = pd.DataFrame.from_records(data)
+        df_list.append(df)
+    except:
+        pass
 
-# Find: EPS (Earnings Per Share) for last five years
-# Find: Current vs Previous Quarterly Earnings up >= 20%
-
-#print(dictionary['metric'])
-
-data = finnhub_client.company_earnings(symbol='DDOG')
-
-out = pd.DataFrame()
-for d in data:
-    out = pd.DataFrame.from_dict(d)
-    
-
-
-
-print(out)
-
-#print(finnhub_client.company_profile(symbol='DDOG'))
-
-#metric = finnhub_client.company_basic_financials('DDOG', 'margin')
-
-#print(metric)
-
-#print(metric['freeOperatingCashFlow/revenueTTM'])
-
-# print(finnhub_client.company_basic_financials('DDOG', 'margin'))
-
-# # Earnings surprises
-# print(finnhub_client.company_earnings('DDOG', limit=5))
+eps_df = pd.concat(df_list, ignore_index = False)
+eps_df.to_csv(r'eps_data.csv')
