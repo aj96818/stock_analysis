@@ -1,0 +1,23 @@
+Notes on Git / Github:
+
+1) Download and install git / gitbash
+
+2) Set email and username
+
+3) cd into the directory you would like to clone Github repository to:
+    https://github.com/aj96818/stock_analysis
+
+4) git fetch origin new_branch
+
+5) git checkout new_branch
+
+6) ** Make code changes to whatever files **
+
+7) git add <filename>
+8) git commit -m "comment"
+
+9) git push origin new_branch
+
+changes will appear in new_branch (can then merge the changes )
+
+https://stackabuse.com/git-merge-branch-into-master/
