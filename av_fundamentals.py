@@ -7,6 +7,9 @@
 
 #pip install alpha_vantage
 
+# free api key: 'YBPBDWS569VUQ3I2'
+# premium api key: W1U7T09FFM4DY97N
+
 import time
 import pandas as pd
 import alpha_vantage
