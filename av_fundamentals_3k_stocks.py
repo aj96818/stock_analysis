@@ -1,4 +1,7 @@
 
+# Install package to a certain location:
+# pip install --target=c:\Users\aljackson\Documents\Environments\py_yfinance\Lib\site-packages alpha_vantage
+
 # Alpha Vantage API has a 5 request per minute limit on their API.
 
 # cd into Documents/Environments
@@ -17,10 +20,19 @@ import requests
 import requests_html
 import json
 
+<<<<<<< HEAD
 #tickers = ['SNE','TAP','SNOW','F','R','NOW','TTD','ADBE','DDOG','FSLY','RAMP','DEM','WIX','SEDG','A','ETSY','PINS','FVRR','AAPN','LI','LYFT','UBER','DFS','DGS','HD','LUV','DIA','CRM','AMD','SNAP','TWTR','NVDA','FB','AAPL','SPLK', 'TWLO', 'AMZN', 'MSFT', 'NFLX', 'NIO', 'WKHS', 'NKLA', 'PRTK', 'EIGR', 'ATRA', 'VKTX', 'VXRT', 'JNJ', 'NVAX', 'AZN', 'INO', 'MRNA', 'TTNP', 'BA', 'SNOW', 'FSLR', 'JOBS', 'APPS', 'SRNE', 'OM', 'CRNC', 'CDLX', 'EBON', 'ATEX']
 path = '//Users/alanjackson/Documents/Environments/stocks_env/NYSE.txt'
 
 # path = 'C:\\Users\\aljackson\\Documents\\Environments\\py_yfinance\\NYSE.txt'
+=======
+#tickers = ['SNE','TAP','SNOW','F','R','NOW','TTD','ADBE']
+
+#path = '//Users/alanjackson/Documents/Environments/stocks_env/NYSE.txt'
+
+
+path = 'C:\\Users\\aljackson\\Documents\\Environments\\py_yfinance\\NYSE.txt'
+>>>>>>> 25de8b3bd9089cf9631c9946691365ec9302f3db
 
 file = open(path, 'r')
 
@@ -37,7 +49,6 @@ for aline in file:
 
 file.close()
 
-#print(tickers[1:50])
 
 df_list = []
 for ticker in tickers:
