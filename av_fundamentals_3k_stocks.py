@@ -7,6 +7,9 @@
 
 #pip install alpha_vantage
 
+# free api key: 'YBPBDWS569VUQ3I2'
+# premium api key: W1U7T09FFM4DY97N
+
 import time
 import pandas as pd
 import alpha_vantage
@@ -15,9 +18,9 @@ import requests_html
 import json
 
 #tickers = ['SNE','TAP','SNOW','F','R','NOW','TTD','ADBE','DDOG','FSLY','RAMP','DEM','WIX','SEDG','A','ETSY','PINS','FVRR','AAPN','LI','LYFT','UBER','DFS','DGS','HD','LUV','DIA','CRM','AMD','SNAP','TWTR','NVDA','FB','AAPL','SPLK', 'TWLO', 'AMZN', 'MSFT', 'NFLX', 'NIO', 'WKHS', 'NKLA', 'PRTK', 'EIGR', 'ATRA', 'VKTX', 'VXRT', 'JNJ', 'NVAX', 'AZN', 'INO', 'MRNA', 'TTNP', 'BA', 'SNOW', 'FSLR', 'JOBS', 'APPS', 'SRNE', 'OM', 'CRNC', 'CDLX', 'EBON', 'ATEX']
-#path = '//Users/alanjackson/Documents/Environments/stocks_env/NYSE.txt'
+path = '//Users/alanjackson/Documents/Environments/stocks_env/NYSE.txt'
 
-path = 'C:\\Users\\aljackson\\Documents\\Environments\\py_yfinance\\NYSE.txt'
+# path = 'C:\\Users\\aljackson\\Documents\\Environments\\py_yfinance\\NYSE.txt'
 
 file = open(path, 'r')
 
@@ -65,5 +68,8 @@ for ticker in tickers:
 
 
 final_df = pd.concat(df_list, ignore_index = True)
-final_df.to_csv(r'C:\\Users\\aljackson\\Documents\\Environments\\py_yfinance\\av_fundamentals_3k_stocks.csv')
+final_df.to_csv(mac_write_path)
+
+mac_write_path = r'//Users/alanjackson/Documents/Environments/stocks_env/av_fundamentals_3k_stocks.csv'
+windows_write_path = 'C:\\Users\\aljackson\\Documents\\Environments\\py_yfinance\\av_fundamentals_3k_stocks.csv'
 
