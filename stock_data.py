@@ -12,9 +12,24 @@ import json
 import finnhub
 from yahoo_fin.stock_info import get_data
 
+# Stocks downloaded from 'www.eoddata.com' on 12/9/2020
+
+path = '//Users/alanjackson/Documents/Environments/stocks_env/NYSE.txt'
+
+file = open(path, 'r')
+
+tickers = []
+
+for aline in file:
+	values = aline.split() 
+	tickers.append(values[0])
+
+file.close()
+
+
 # av_fundamentals.py
 
-tickers = ['SNE','TAP','SNOW','F','R','NOW','TTD','ADBE','DDOG','FSLY']
+#tickers_short = ['SNE','TAP','SNOW','F','R','NOW','TTD','ADBE','DDOG','FSLY']
 #'RAMP','DEM','WIX','SEDG','A','ETSY','PINS','FVRR','AAPN','LI','LYFT','UBER','DFS',
 #			'DGS','HD','LUV','DIA','CRM','AMD','SNAP','TWTR','NVDA','FB','AAPL','SPLK', 'TWLO', 'AMZN', 'MSFT', 'NFLX', 'NIO', 'WKHS', 'NKLA', 'PRTK', 'EIGR', 'ATRA',
  #			'VKTX', 'VXRT', 'JNJ', 'NVAX', 'AZN', 'INO', 'MRNA', 'TTNP', 'BA', 'SNOW', 'FSLR', 'JOBS', 'APPS', 'SRNE', 'OM', 'CRNC', 'CDLX', 'EBON', 'ATEX']
@@ -71,6 +86,7 @@ eps_df.to_csv(r'eps_data.csv')
 
 
 # yahoo_api.py
+# filters: > 1 billion 
 
 historical_data = {}
 for ticker in tickers:
@@ -85,8 +101,7 @@ for df in historical_data:
 
 yahoo_df = pd.concat(out, ignore_index = False)
 
-#yahoo_df.to_csv(r'stock_data_full.csv')
-
+yahoo_df.to_csv(r'//Users/alanjackson/Documents/Environments/stocks_env/stock_data_full.csv')
 
 
 
