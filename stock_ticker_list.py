@@ -5,13 +5,13 @@ path = '//Users/alanjackson/Documents/Environments/stocks_env/NYSE.txt'
 path2 = '//Users/alanjackson/Documents/Environments/stocks_env/stock_data_full_3k.csv'
 
 
-
+path_win = 'C:\Users\aljackson\Documents\Environments\py_yfinance\NYSE.txt'
 
 # Stocks downloaded from 'www.eoddata.com' on 12/9/2020
 
 path = '//Users/alanjackson/Documents/Environments/stocks_env/NYSE.txt'
 
-file = open(path, 'r')
+file = open(path_win, 'r')
 
 tickers = []
 
