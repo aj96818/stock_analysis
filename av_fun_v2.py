@@ -25,7 +25,7 @@ for aline in file:
 
 file.close()
 
-#tickers = ['SNE','TAP','SNOW','F','R','NOW','TTD','ADBE','DDOG']
+# tickers = ['SNE','TAP','SNOW','F','R','NOW','TTD','ADBE','DDOG']
 
 df_list = []
 for ticker in tickers:
@@ -48,13 +48,10 @@ for ticker in tickers:
 		df = pd.DataFrame.from_dict(subset_d, orient = 'index')
 		df = df.transpose()
 		df_list.append(df)
+		time.sleep(2)
 	except:
 		pass
 
-
-#	print(df)
-	# for key in d:
-	# 	print(key)
 
 final_df = pd.concat(df_list, ignore_index = True)
 
@@ -65,4 +62,3 @@ final_df.to_csv(win_path)
 
 
 
-#print(final_df)
