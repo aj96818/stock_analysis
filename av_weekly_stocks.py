@@ -13,10 +13,14 @@ file = open(path_win, 'r')
 tickers = []
 
 for aline in file:
-	values = aline.split() 
-	tickers.append(values[0])
+	try:
+		values = aline.split() 
+		tickers.append(values[0])
+	except IndexError:
+		tickers.append('NA')
 
 file.close()
+
 
 #tickers = ['SNE', 'TAP']
 
