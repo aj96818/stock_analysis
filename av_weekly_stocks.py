@@ -7,11 +7,20 @@ import requests
 import requests_html
 import json
 
-tickers = ['SNE', 'TAP']
+path_win = 'C:/Users/aljackson/Documents/Environments/py_yfinance/NYSE.txt'
+file = open(path_win, 'r')
+
+tickers = []
+
+for aline in file:
+	values = aline.split() 
+	tickers.append(values[0])
+
+file.close()
+
+#tickers = ['SNE', 'TAP']
 
 #,'TAP','SNOW','F','R','NOW','TTD','ADBE','DDOG']
-
-
 # 'FSLY','RAMP','DEM','WIX','SEDG','A','ETSY','PINS','FVRR','AAPN','LI',
 # 'LYFT','UBER','DFS','DGS','HD','LUV','DIA','CRM','AMD','SNAP','TWTR','NVDA',
 # 'FB','AAPL','SPLK', 'TWLO', 'AMZN', 'MSFT', 'NFLX', 'NIO', 'WKHS', 'NKLA',
@@ -30,10 +39,9 @@ for ticker in tickers:
 	    "outputsize" : "compact",
 	    "datatype": "json", 
 	    "apikey": 'W1U7T09FFM4DY97N'} 
-
 	
 	response = requests.get(API_URL, data) 
-	response_json = response.json() # maybe redundant
+	response_json = response.json()
 
 	x = json.dumps(response_json)
 	d = json.loads(x)
@@ -46,84 +54,20 @@ for ticker in tickers:
  		date_list.append(date)
  		data_list.append(data)
 
-#print(date_list)
-#print(data_list)
-
 	df_date = pd.DataFrame(date_list)
 	df_data = pd.DataFrame(data_list)
 
-#print(date_list)
-#print(df_data)
-
 	df = pd.concat([df_date, df_data], axis = 1)
 	df['Symbol'] = ticker
-	#master_df.append(df)
 	df_list.append(df)
+	time.sleep(2)
 
 master_df = pd.concat(df_list, ignore_index = False)
 master_df.columns = ['date', 'open', 'high', 'low', 'close', 'adj close', 'volume', 'dividend', 'symbol']
 
 df_2yr = master_df[(master_df['date'] > '2018-01-01')]
 
-df_2yr.to_csv(r'//Users/alanjackson/Documents/Environments/stocks_env/av_fundamentals_weekly.csv')
+mac_write_path = r'//Users/alanjackson/Documents/Environments/stocks_env/av_weekly_prices.csv'
+win_write_path = r'C:/Users/aljackson/Documents/Environments/py_yfinance/av_weekly_prices.csv'
 
-
-#  		for date, df in data.items():
-#  			df['Date'] = date
-
-# master_frame = pd.concat(sorted(data.values(), key = lambda df: df['Date'][0]), ignore_index = True)
-
-
-
-
-
-
-
-
-
-	# final_df = pd.DataFrame()
-
-	# for key, value in d['Weekly Adjusted Time Series'].items():
-	# 	df = value
-	# 	df.loc[:, 'Date'] = key
-	# 	final_df = pd.concat([df, final_df], 0)
-
-	# print(final_df)
-
-# 	for line in d['Weekly Adjusted Time Series'].items():
-# 		date, data = line
-# #		print(type(date))
-# 		df_date = pd.DataFrame.
-
-# 		df = pd.DataFrame.from_dict(data, orient = 'index')
-# 		df2 = pd.concat(date, df)
-# 		print(df2)
-
-# #		df.set_index(date)
-# #		df_transposed = df.transpose()
-# #		print(df_transposed) 
-		
-
-	
-
-
-	#print(dict_data)
-	#df = pd.DataFrame.from_dict(data, orient = 'index')
-
-	#df['index_col'] = df.index
-	#df = df.set_index('index_col')
-	#df_transposed = df.transpose()
-
-	#print(df_transposed)
-
-	# if set(['Symbol', 'Name','MarketCapitalization', 'EBITDA', 'LatestQuarter', 'PercentInstitutions']).issubset(df_transposed.columns):
-	# 	df_short = df_transposed[['Symbol', 'Name','MarketCapitalization', 'EBITDA', 'LatestQuarter', 'PercentInstitutions']]
-	# 	df_list.append(df_short)
-	# time.sleep(2)
-
-
-#print(df_list)
-
-# final_df = pd.concat(df_list, ignore_index = True)
-# final_df.to_csv(r'//Users/alanjackson/Documents/Environments/stocks_env/av_fundamentals_weekly.csv')
-
+df_2yr.to_csv(win_write_path)
