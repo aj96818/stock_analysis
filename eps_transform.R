@@ -32,6 +32,12 @@ pvt_wide_list <- lapply(eps_list, pvt_wide_func)
 
 df_wide <- bind_rows(pvt_wide_list)
 
+vars <- c('symbol', '2020-09-30', '2020-06-30', '2020-03-31', '2019-12-31')
+
+df_final <- df_wide[vars]
+
+
+
 
 setwd('~/Documents/Environments/stocks_env/')
 
