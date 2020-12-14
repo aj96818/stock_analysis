@@ -37,12 +37,12 @@ finhub_list = []
 
 # tickers = ['SNE', 'TAP', 'SNOW']
 for ticker in tickers:
-    try:
-        data = finnhub_client.company_earnings(symbol = ticker)
-        df = pd.DataFrame.from_records(data)
-        finhub_list.append(df)
-    except:
-        pass
+	try:
+		data = finnhub_client.company_earnings(symbol = ticker)
+		df = pd.DataFrame.from_records(data)
+		finhub_list.append(df)
+	except:
+		pass
 
 win_eps_path = r'C:/Users/aljackson/Documents/Environments/py_yfinance/Finhub_EPS_Data.csv'
 
@@ -56,11 +56,11 @@ for ticker in tickers:
 	try:
 		API_URL = "https://www.alphavantage.co/query" 
 		data = { 
-		    "function": 'OVERVIEW', 
-		    "symbol": ticker,
-		    "outputsize" : "compact",
-		    "datatype": "json", 
-		    "apikey": 'W1U7T09FFM4DY97N'} 
+			"function": 'OVERVIEW', 
+			"symbol": ticker,
+			"outputsize" : "compact",
+			"datatype": "json", 
+			"apikey": 'W1U7T09FFM4DY97N'} 
 
 		response = requests.get(API_URL, data) 
 		response_json = response.json() # maybe redundant
@@ -72,7 +72,7 @@ for ticker in tickers:
 		df = pd.DataFrame.from_dict(subset_d, orient = 'index')
 		df = df.transpose()
 		fun_list.append(df)
-        time.sleep(2)
+		time.sleep(2)
 	except:
 		pass
 
@@ -91,11 +91,11 @@ for ticker in tickers:
 	try:
 		API_URL = "https://www.alphavantage.co/query" 
 		data = { 
-	    	"function": 'TIME_SERIES_WEEKLY_ADJUSTED', 
-	    	"symbol": ticker,
-	    	"outputsize" : "compact",
-	    	"datatype": "json", 
-	    	"apikey": 'W1U7T09FFM4DY97N'} 
+			"function": 'TIME_SERIES_WEEKLY_ADJUSTED', 
+			"symbol": ticker,
+			"outputsize" : "compact",
+			"datatype": "json", 
+			"apikey": 'W1U7T09FFM4DY97N'} 
 	
 		response = requests.get(API_URL, data) 
 		response_json = response.json()
