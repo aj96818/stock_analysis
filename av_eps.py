@@ -63,8 +63,8 @@ for ticker in tickers:
 df_out = pd.concat(eps_list, ignore_index = True)
 
 
-mac_path = r'//Users/alanjackson/Documents/Environments/stocks_env/av_fun_v2.csv'
-win_path = r'C:\\Users\\aljackson\\Documents\\Environments\\py_yfinance\\av_fun_v2.csv'
+mac_path = r'//Users/alanjackson/Documents/Environments/stocks_env/AV_EPS_Data.csv'
+win_path = r'C:\\Users\\aljackson\\Documents\\Environments\\py_yfinance\\AV_EPS_Data.csv'
 
 df_out.to_csv(win_path)
 
