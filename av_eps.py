@@ -1,4 +1,4 @@
-# premium api key: W1U7T09FFM4DY97N
+# Premium Alpha Vantage API Key: W1U7T09FFM4DY97N
 
 import time
 import pandas as pd
@@ -6,8 +6,6 @@ import alpha_vantage
 import requests
 import requests_html
 import json
-import finnhub
-
 
 
 # Get stock tickers from www.eoddata.com
@@ -19,9 +17,9 @@ file = open(win_nyse, 'r')
 
 tickers = []
 
-for aline in file:
+for line in file:
 	try:
-		values = aline.split() 
+		values = line.split() 
 		tickers.append(values[0])
 	except IndexError:
 		tickers.append('NA')
@@ -56,6 +54,7 @@ for ticker in tickers:
 			df = df.transpose()
 			df['symbol'] = ticker
 			eps_list.append(df)
+			time.sleep(2)
 	except:
 		pass		
 
