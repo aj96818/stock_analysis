@@ -7,52 +7,99 @@ import requests
 import requests_html
 import json
 import finnhub
-# pip install finnhub-python
 
+
+startTime = time.time()
 
 # Get stock tickers from www.eoddata.com
 
+win_nasdaq = 'C:/Users/aljackson/Documents/Environments/py_yfinance/NASDAQ.txt'
 win_nyse = 'C:/Users/aljackson/Documents/Environments/py_yfinance/NYSE.txt'
 mac_nyse = '//Users/alanjackson/Documents/Environments/stocks_env/NYSE.txt'
 
-file = open(win_nyse, 'r')
+# Create list of symbols from NYSE
 
-tickers = []
+file_NYSE = open(win_nyse, 'r')
 
-for aline in file:
+tickers_nyse = []
+
+for line in file_NYSE:
 	try:
-		values = aline.split() 
-		tickers.append(values[0])
+		values = line.split() 
+		tickers_nyse.append(values[0])
 	except IndexError:
-		tickers.append('NA')
+		tickers_nyse.append('NA')
+file_NYSE.close()
 
-file.close()
+# Create list of symbols from NASDAQ
 
+file_NASDAQ = open(win_nasdaq, 'r')
 
-# Get earnings data for all stocks from Finhub API: 
+tickers_nasdaq = []
 
-finnhub_client = finnhub.Client(api_key='buugqr748v6rvcd72r80')
-
-finhub_list = []
-
-# tickers = ['SNE', 'TAP', 'SNOW']
-for ticker in tickers:
+for line in file_NASDAQ:
 	try:
-		data = finnhub_client.company_earnings(symbol = ticker)
-		df = pd.DataFrame.from_records(data)
-		finhub_list.append(df)
+		values = line.split() 
+		tickers_nasdaq.append(values[0])
+	except IndexError:
+		tickers_nasdaq.append('NA')
+
+file_NASDAQ.close()
+
+tickers = tickers_nyse + tickers_nasdaq
+
+unique_tickers = []
+
+for i in tickers:
+	if i not in unique_tickers:
+		unique_tickers.append(i)
+
+idx_tickers = ['SPY', 'IXIC', 'DJI', 'DIA', 'IWM']
+
+unique_tickers.extend(idx_tickers)
+
+# Get Earnings data for all stocks from Alpha Vantage API: 
+
+eps_list = []
+for ticker in unique_tickers:
+	try:
+		API_URL = "https://www.alphavantage.co/query" 
+		data = { 
+			"function": 'EARNINGS', 
+			"symbol": ticker,
+			"outputsize" : "compact",
+			"datatype": "json", 
+			"apikey": 'W1U7T09FFM4DY97N'} 
+
+		response = requests.get(API_URL, data) 
+		response_json = response.json() # maybe redundant
+		
+		x = json.dumps(response_json)
+		d = json.loads(x)
+		e = d['quarterlyEarnings'][:5]
+		
+		for dic in e:
+			df = pd.DataFrame.from_dict(dic, orient = 'index')
+			df = df.transpose()
+			df['symbol'] = ticker
+			eps_list.append(df)
+			time.sleep(2)
 	except:
-		pass
+		pass		
 
-win_eps_path = r'C:/Users/aljackson/Documents/Environments/py_yfinance/Finhub_EPS_Data.csv'
+df_eps = pd.concat(eps_list, ignore_index = True)
 
-eps_df = pd.concat(finhub_list, ignore_index = False)
-eps_df.to_csv(win_eps_path)
+#print(df_eps)
+
+mac_path = r'//Users/alanjackson/Documents/Environments/stocks_env/AV_EPS_Data.csv'
+win_path = r'C:\\Users\\aljackson\\Documents\\Environments\\py_yfinance\\AV_EPS_Data.csv'
+
+#df_eps.to_csv(win_path)
 
 # Get Fundamentals data for all stocks from Alpha Vantage API (Alpha Vantage API).
 
 fun_list = []
-for ticker in tickers:
+for ticker in unique_tickers:
 	try:
 		API_URL = "https://www.alphavantage.co/query" 
 		data = { 
@@ -87,7 +134,7 @@ win_fun_path = r'C:\\Users\\aljackson\\Documents\\Environments\\py_yfinance\\av_
 
 master_df = pd.DataFrame()
 stocks_list = []
-for ticker in tickers:
+for ticker in unique_tickers:
 	try:
 		API_URL = "https://www.alphavantage.co/query" 
 		data = { 
@@ -135,6 +182,14 @@ win_stocks_path = r'C:/Users/aljackson/Documents/Environments/py_yfinance/av_wee
 merged_left = pd.merge(left = df_2yr, right = df_fun, how = 'left', left_on = 'symbol', right_on = 'Symbol')
 
 mac_stocks_fun_path = r'//Users/alanjackson/Documents/Environments/stocks_env/av_stocks_fun.csv'
-win_stocks_fun_path = r'C:/Users/aljackson/Documents/Environments/py_yfinance/AV_StocksFundmtls_Merged.csv'
+win_stocks_fun_path = r'C:/Users/aljackson/Documents/Environments/py_yfinance/AV_StocksFundamentals_Merged.csv'
 
 merged_left.to_csv(win_stocks_fun_path)
+
+executionTime = (time.time() - startTime)
+print('Execution time in hours: ' + str(executionTime/3600))
+
+
+
+
+
