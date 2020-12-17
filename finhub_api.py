@@ -46,7 +46,7 @@ for ticker in tickers:
 		data = finnhub_client.company_earnings(symbol = ticker)
 		df = pd.DataFrame.from_records(data)
 		finhub_list.append(df)
-        time.sleep(2)
+		time.sleep(2)
 	except:
 		pass
 
