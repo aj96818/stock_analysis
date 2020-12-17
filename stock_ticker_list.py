@@ -11,6 +11,8 @@ path_win = 'C:\Users\aljackson\Documents\Environments\py_yfinance\NYSE.txt'
 
 path = '//Users/alanjackson/Documents/Environments/stocks_env/NYSE.txt'
 
+
+path_win = 'C:\Users\aljackson\Documents\Environments\py_yfinance\NYSE.txt'
 file = open(path_win, 'r')
 
 tickers = []
