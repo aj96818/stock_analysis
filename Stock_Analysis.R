@@ -14,25 +14,25 @@ setwd(win_wd)
 
 # Read in Alpha Vantage stock data merged with Alpha Vantage Fundamentals data:
 
-av_data <- read_csv("Environments/py_yfinance/AV_StocksFundmtls_Merged.csv", col_types = cols(X1 = col_integer(), date = col_date(format = "%Y-%m-%d")))
-colnames(av_data)[1] <- 'Index'
+
+av_stocks <- read_csv("~/Documents/Environments/stocks_env/AV_StocksFundamentals_Merged.csv", col_types = cols(LatestQuarter = col_date(format = "%Y-%m-%d"), X1 = col_integer(), date = col_date(format = "%Y-%m-%d")))
+colnames(av_stocks)[1] <- 'Index'
+
+av_eps <- read_csv("~/Documents/Environments/stocks_env/AV_EPS_Data.csv", col_types = cols(X1 = col_integer(), reportedDate = col_date(format = "%Y-%m-%d")))
+colnames(av_eps)[1] <- 'index'
 
 
-# Read in Finhub API Earnings data:
+av_eps$unique_row <- paste0(av_eps$symbol, av_eps$index)
+dupes<-av_eps[c('unique_row')]
+av_eps<-av_eps[!duplicated(dupes),]
 
-eps_data <- read_csv("Environments/py_yfinance/Finhub_EPS_Data.csv", col_types = cols(period = col_date(format = "%Y-%m-%d")))
-colnames(eps_data)[1] <- 'index'
-
-eps_data$unique_row <- paste0(eps_data$symbol, eps_data$index)
-dupes<-eps_data[c('unique_row')]
-eps_data<-eps_data[!duplicated(dupes),]
-eps_list <- split(eps_data, eps_data$symbol)
+eps_list <- split(av_eps, av_eps$symbol)
 
 
 pvt_wide_func <- function(df){
-  myvars <- c('unique_row', 'actual', 'period')
+  myvars <- c('unique_row', 'reportedEPS', 'fiscalDateEnding')
   df <- df[myvars]
-  pv_wide_df <- tidyr::pivot_wider(df, names_from = period, values_from = actual)
+  pv_wide_df <- tidyr::pivot_wider(df, names_from = fiscalDateEnding, values_from = reportedEPS)
   pv_wide_df$symbol <- gsub('[[:digit:]]+', '', pv_wide_df$unique_row)
   pv_wide_df <- pv_wide_df[, !(colnames(pv_wide_df) == 'unique_row')]
   pv_final <- pv_wide_df %>%
@@ -47,22 +47,7 @@ df_wide <- bind_rows(pvt_wide_list)
 
 vars <- c('symbol', '2020-09-30', '2020-06-30', '2020-03-31', '2019-12-31')
 
-df_final <- df_wide[vars]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+eps_final <- df_wide[vars]
 
 
 
