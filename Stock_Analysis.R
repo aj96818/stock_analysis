@@ -12,13 +12,11 @@ win_wd = 'C:/Users/aljackson/Documents/Environments/py_yfinance/'
   
 setwd(win_wd)
 
-# Read in Alpha Vantage stock data merged with Alpha Vantage Fundamentals data:
 
+# Read in AV EPS data and transform it from long format to wide format so each stock symbol has one record and it can be neatly joined to Stocks&Fundamentals dataframe.
 
-av_stocks <- read_csv("~/Documents/Environments/stocks_env/AV_StocksFundamentals_Merged.csv", col_types = cols(LatestQuarter = col_date(format = "%Y-%m-%d"), X1 = col_integer(), date = col_date(format = "%Y-%m-%d")))
-colnames(av_stocks)[1] <- 'Index'
-
-av_eps <- read_csv("~/Documents/Environments/stocks_env/AV_EPS_Data.csv", col_types = cols(X1 = col_integer(), reportedDate = col_date(format = "%Y-%m-%d")))
+win_av_eps_path <- 'C:/Users/aljackson/Documents/Environments/py_yfinance/AV_EPS_Data.csv'
+av_eps <- read_csv(win_av_eps_path, col_types = cols(X1 = col_integer(), reportedDate = col_date(format = "%Y-%m-%d")))
 colnames(av_eps)[1] <- 'index'
 
 
@@ -42,45 +40,38 @@ pvt_wide_func <- function(df){
 }
 
 pvt_wide_list <- lapply(eps_list, pvt_wide_func)
-
 df_wide <- bind_rows(pvt_wide_list)
-
-vars <- c('symbol', '2020-09-30', '2020-06-30', '2020-03-31', '2019-12-31')
-
+vars <- c('symbol', '2020-09-30', '2020-06-30', '2020-03-31', '2019-12-31', '2019-09-30', '2019-06-30', '2019-03-31', '2018-12-31', '2018-09-30', '2018-06-30', '2018-03-31', '2017-12-31')
 eps_final <- df_wide[vars]
 
+eps_final$eps_2020_09_30_chg <- eps_final$`2020-09-30` - eps_final$`2020-06-30`
+eps_final$eps_2020_06_30_chg <- eps_final$`2020-06-30` - eps_final$`2020-03-31`
+eps_final$eps_2020_03_31_chg <- eps_final$`2020-03-31` - eps_final$`2019-12-31`
+eps_final$eps_2019_12_31_chg <- eps_final$`2019-12-31` - eps_final$`2019-09-30`
+eps_final$eps_2020_09_yr_chg <- eps_final$`2020-09-30` - eps_final$`2019-09-30`
 
 
-
-
-
-
-
-
-setwd('C:/Users/aljackson/Documents/Environments/py_yfinance/')
-eps_data <- read_csv("eps_data.csv", col_types = cols(period = col_date(format = "%Y-%m-%d")))
-
-eps_data <- eps_data[,2:5]
-
-eps_ranked_dates <- eps_data %>% group_by(symbol) %>%
-  mutate(rank = rank(period)) %>% arrange(symbol)
-
-eps_list <- split(eps_ranked_dates, f = eps_ranked_dates$symbol)
-
-#(df$actual[df$rank == max(df$rank)] - df$actual[df$rank == max(df$rank-1)]) /df$actual[df$rank == max(df$rank-1)]
-
-
-calc_eps_pct_chg <- function(df){
-  df$eps_last_qtr_chg <- ifelse(length(df$symbol) > 1, (df$actual[df$rank == max(df$rank)] - df$actual[df$rank == max(df$rank-1)]) /df$actual[df$rank == max(df$rank-1)], 0)
-  df$eps_2qtr_chg <- ifelse(length(df$symbol) >= 3, (df$actual[df$rank == max(df$rank)] - df$actual[df$rank == max(df$rank-2)]) /df$actual[df$rank == max(df$rank-2)], 0)
-  df$eps_3qtr_chg <- ifelse(length(df$symbol) >= 4, (df$actual[df$rank == max(df$rank)] - df$actual[df$rank == max(df$rank-3)]) /df$actual[df$rank == max(df$rank-3)], 0)
-  return(df)
-  }
-
-
-df_list_out <- lapply(eps_list, calc_eps_pct_chg)
-df_eps<-ldply(df_list_out, data.frame)
+# calc_eps_pct_chg <- function(df){
+#   df$eps_last_qtr_chg <- ifelse(length(df$symbol) > 1, (df$actual[df$rank == max(df$rank)] - df$actual[df$rank == max(df$rank-1)]) /df$actual[df$rank == max(df$rank-1)], 0)
+#   df$eps_2qtr_chg <- ifelse(length(df$symbol) >= 3, (df$actual[df$rank == max(df$rank)] - df$actual[df$rank == max(df$rank-2)]) /df$actual[df$rank == max(df$rank-2)], 0)
+#   df$eps_3qtr_chg <- ifelse(length(df$symbol) >= 4, (df$actual[df$rank == max(df$rank)] - df$actual[df$rank == max(df$rank-3)]) /df$actual[df$rank == max(df$rank-3)], 0)
+#   return(df)
+# }
+# df_list_out <- lapply(eps_list, calc_eps_pct_chg)
+# df_eps<-ldply(df_list_out, data.frame)
 #write_csv(df_eps, 'eps_pct_chg.csv')
+
+
+# Read in AV Stock and Fundamentals data and merge it with transformed EPS dataframe above (eps_final)
+
+mac_av_stocks_path <- "~/Documents/Environments/stocks_env/AV_StocksFundamentals_Merged.csv"
+win_av_stocks_path <- 'C:/Users/aljackson/Documents/Environments/py_yfinance/AV_StocksFundamentals_Merged.csv'
+
+av_stocks <- read_csv(win_av_stocks_path, col_types = cols(LatestQuarter = col_date(format = "%Y-%m-%d"), X1 = col_integer(), date = col_date(format = "%Y-%m-%d")))
+colnames(av_stocks)[1] <- 'Index'
+
+
+av_merged <- merge(av_stocks, eps_final, by.x = 'Symbol', by.y = 'symbol', all.x = TRUE)
 
 
 
