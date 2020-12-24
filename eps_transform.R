@@ -1,11 +1,10 @@
 
-#install.packages("reshape")
 
 library(tidyr)
 library(plyr)
 library(dplyr)
 library(readr)
-library(reshape)
+
 
 eps_data <- read_csv("~/Documents/Environments/stocks_env/eps_data.csv", col_types = cols(period = col_date(format = "%Y-%m-%d")))
 colnames(eps_data)[1] <- 'index'
