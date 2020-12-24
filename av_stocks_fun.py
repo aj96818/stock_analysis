@@ -1,5 +1,6 @@
 # premium api key: W1U7T09FFM4DY97N
 
+import datetime
 import time
 import pandas as pd
 import alpha_vantage
@@ -91,10 +92,13 @@ df_eps = pd.concat(eps_list, ignore_index = True)
 
 #print(df_eps)
 
-mac_path = r'//Users/alanjackson/Documents/Environments/stocks_env/AV_EPS_Data.csv'
-win_path = r'C:\\Users\\aljackson\\Documents\\Environments\\py_yfinance\\AV_EPS_Data.csv'
+today = datetime.date.today()
+dt = today.strftime("%Y-%m-%d")
 
-#df_eps.to_csv(win_path)
+mac_path = r'//Users/alanjackson/Documents/Environments/stocks_env/AV_EPS_Data.csv'
+win_path = r'C:/Users/aljackson/Documents/Environments/py_yfinance/' + 'AV_EPS_Report_' + str(dt) + '.csv'
+
+df_eps.to_csv(win_path)
 
 # Get Fundamentals data for all stocks from Alpha Vantage API (Alpha Vantage API).
 
@@ -126,9 +130,9 @@ for ticker in unique_tickers:
 df_fun = pd.concat(fun_list, ignore_index = True)
 
 mac_fun_path = r'//Users/alanjackson/Documents/Environments/stocks_env/av_fun_data.csv'
-win_fun_path = r'C:\\Users\\aljackson\\Documents\\Environments\\py_yfinance\\av_fun_data.csv'
+win_fun_path = r'C:\\Users\\aljackson\\Documents\\Environments\\py_yfinance\\AV_Fundamentals_Data.csv'
 
-#df_fun.to_csv(win_fun_path)
+# df_fun.to_csv(win_fun_path)
 
 # Get weekly adjusted stock data for all stocks from Alpha Vantage API (Alpha Vantage API)
 
@@ -171,7 +175,7 @@ for ticker in unique_tickers:
 master_df = pd.concat(stocks_list, ignore_index = False)
 master_df.columns = ['date', 'open', 'high', 'low', 'close', 'adj close', 'volume', 'dividend', 'symbol']
 
-df_2yr = master_df[(master_df['date'] > '2018-01-01')]
+df_2yr = master_df[(master_df['date'] > '2020-01-01')]
 
 mac_stocks_path = r'//Users/alanjackson/Documents/Environments/stocks_env/av_weekly_stocks.csv'
 win_stocks_path = r'C:/Users/aljackson/Documents/Environments/py_yfinance/av_weekly_stocks.csv'
@@ -182,14 +186,9 @@ win_stocks_path = r'C:/Users/aljackson/Documents/Environments/py_yfinance/av_wee
 merged_left = pd.merge(left = df_2yr, right = df_fun, how = 'left', left_on = 'symbol', right_on = 'Symbol')
 
 mac_stocks_fun_path = r'//Users/alanjackson/Documents/Environments/stocks_env/av_stocks_fun.csv'
-win_stocks_fun_path = r'C:/Users/aljackson/Documents/Environments/py_yfinance/AV_StocksFundamentals_Merged.csv'
+win_stocks_fun_path = r'C:/Users/aljackson/Documents/Environments/py_yfinance/' + 'AV_Stocks&Fundamentals_Merged_' + str(dt) + '.csv'
 
 merged_left.to_csv(win_stocks_fun_path)
 
 executionTime = (time.time() - startTime)
 print('Execution time in hours: ' + str(executionTime/3600))
-
-
-
-
-
