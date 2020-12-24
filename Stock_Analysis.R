@@ -1,6 +1,7 @@
 
-#install.packages("tidyr")
+#install.packages("tidyquant")
 
+library(tidyquant)
 library(plyr)
 library(dplyr)
 library(ggplot2)
@@ -70,19 +71,87 @@ win_av_stocks_path <- 'C:/Users/aljackson/Documents/Environments/py_yfinance/AV_
 av_stocks <- read_csv(win_av_stocks_path, col_types = cols(LatestQuarter = col_date(format = "%Y-%m-%d"), X1 = col_integer(), date = col_date(format = "%Y-%m-%d")))
 colnames(av_stocks)[1] <- 'Index'
 
-
 av_merged <- merge(av_stocks, eps_final, by.x = 'Symbol', by.y = 'symbol', all.x = TRUE)
 
+av_merged$avg_price <- (av_merged$high + av_merged$`adj close` + av_merged$low) / 3
+av_merged$AvgPriceXVol <- av_merged$avg_price * av_merged$volume
 
+av_merge_split <- split(av_merged, av_merged$symbol)
+
+# https://www.youtube.com/watch?v=L1J3M9jEWvQ
+
+VMAP_func <- function(df){
+  df <- df %>%
+    mutate(avg_price_lag0 = avg_price,
+           avg_price_lag1 = lag(avg_price, n = 1, order_by = date),
+           avg_price_lag2 = lag(avg_price, n = 2, order_by = date),
+           avg_price_lag3 = lag(avg_price, n = 3, order_by = date),
+           avg_price_lag4 = lag(avg_price, n = 4, order_by = date))
+  df <- df %>%
+    mutate(APXVol_lag0 = AvgPriceXVol,
+           APXVol_lag1 = lag(AvgPriceXVol, n = 1, order_by = date),
+           APXVol_lag2 = lag(AvgPriceXVol, n = 2, order_by = date),
+           APXVol_lag3 = lag(AvgPriceXVol, n = 3, order_by = date),
+           APXVol_lag4 = lag(AvgPriceXVol, n = 4, order_by = date),
+           Vol_lag0 = volume,
+           Vol_lag1 = lag(volume, n = 1, order_by = date),
+           Vol_lag2 = lag(volume, n = 2, order_by = date),
+           Vol_lag3 = lag(volume, n = 3, order_by = date),
+           Vol_lag4 = lag(volume, n = 4, order_by = date))
+  df <- df %>%
+    mutate(VMAP_4wk = (APXVol_lag0 + APXVol_lag1 + APXVol_lag2 + APXVol_lag3 + APXVol_lag4)/(Vol_lag0 + Vol_lag1 + Vol_lag2 + Vol_lag3 + Vol_lag4))
+  df <- df %>%
+    mutate(StDev_4wk = sd(c(avg_price_lag0, avg_price_lag1, avg_price_lag2, avg_price_lag3, avg_price_lag4), na.rm = T))
+  df <- df %>%
+    mutate(Upper_BB = VMAP_4wk + (StDev_4wk * 0.75))
+  df <- df %>%
+    mutate(Lower_BB = VMAP_4wk - (StDev_4wk * 0.75))
+  
+  return(df)
+}
+
+av_merge_split <- lapply(av_merge_split, VMAP_func)
+
+av_merged <- ldply(av_merge_split, data.frame)
+
+sq <- av_merged[av_merged$symbol == 'SQ',]
+#write_csv(test, 'test_lag44.csv')
+
+
+p = ggplot() + 
+  geom_line(data = sq, aes(x = date, y = `adj.close`), color = "blue") +
+  geom_line(data = sq, aes(x = date, y = VMAP_4Wk), color = "red") +
+  geom_line(data = sq, aes(x = date, y = Upper_BB), color = "black") +
+  geom_line(data = sq, aes(x = date, y = Lower_BB), color = "black") +
+  xlab('Dates') +
+  ylab('Adj Close')
+
+print(p)
+
+
+
+
+mid_range_stocks <- av_merged[av_merged$`adj close` >= 10 & av_merged$`adj close` <= 30 & av_merged$eps_last_qtr_chg > 0 & av_merged$eps_2020_09_yr_chg > 0 & av_merged$MarketCapitalization >= 1000000000,]
+
+small_cap <- mid_range_stocks[which(!is.na(mid_range_stocks[,1])),]
+
+write_csv(small_cap, 'mid_range_stocks.csv')
 
 # Let's start plotting!
 
-azn <- recent[recent$ticker == 'AZN',]
-ggplot(azn, aes(x = (Date), y = adjclose)) + geom_line(color = "darkblue") + ggtitle("AstraZeneca Adj Close Price") + xlab("Date") + ylab("Price") + theme(plot.title = element_text(hjust = 0.5)) + scale_x_date(date_labels = "%b %y", date_breaks = "6 months")
+azn <- av_merged[av_merged$symbol == 'AZN',]
+sq <- av_merged[av_merged$symbol == 'SQ',]
+apple <- av_merged[av_merged$symbol == 'AAPL',]
+
+# https://www.reed.edu/data-at-reed/resources/R/loops_with_ggplot2.html
+# ggplot(i, aes(x = (date), y = `adj close`)) + geom_line(color = "darkblue") + ggtitle("AstraZeneca Adj Close Price") + xlab("Date") + ylab("Price") + theme(plot.title = element_text(hjust = 0.5)) + scale_x_date(date_labels = "%b %y", date_breaks = "6 months") + geom_bbands(aes(high = high, low = low, close = `adj close`, volume = volume), ma_fun = VWMA, n = 7)
 
 
-
-
-
-
+stock_list <- list(azn, sq, apple)
+  
+for(i in  stock_list) {
+  plot <- ggplot(i, aes(x = (date), y = `adj close`)) + geom_line(color = "darkblue") + ggtitle("AstraZeneca Adj Close Price") + xlab("Date") + ylab("Price") + theme(plot.title = element_text(hjust = 0.5)) + scale_x_date(date_labels = "%b %y", date_breaks = "6 months") + geom_bbands(aes(high = high, low = low, close = `adj close`, volume = volume), ma_fun = VWMA, n = 20)
+  print(plot)
+  par(ask = TRUE)
+}
 
