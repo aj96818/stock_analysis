@@ -175,7 +175,7 @@ for ticker in unique_tickers:
 master_df = pd.concat(stocks_list, ignore_index = False)
 master_df.columns = ['date', 'open', 'high', 'low', 'close', 'adj close', 'volume', 'dividend', 'symbol']
 
-df_2yr = master_df[(master_df['date'] > '2020-01-01')]
+df_2yr = master_df[(master_df['date'] > '2015-01-01')]
 
 mac_stocks_path = r'//Users/alanjackson/Documents/Environments/stocks_env/av_weekly_stocks.csv'
 win_stocks_path = r'C:/Users/aljackson/Documents/Environments/py_yfinance/av_weekly_stocks.csv'
