@@ -8,19 +8,19 @@ library(ggplot2)
 library(readr)
 library(tidyr)
 
-mac_wd = ''
+mac_wd = '/Users/alanjackson/Documents/Environments/stocks_env/'
 win_wd = 'C:/Users/aljackson/Documents/Environments/py_yfinance/'
   
-setwd(win_wd)
+setwd(mac_wd)
 
 
 # Read in AV EPS data and transform it from long format to wide format so each stock symbol has one record and it can be neatly joined to Stocks & Fundamentals dataframe.
 
-
-date <- '2020-12-24'
+date <- '2020-12-30'
 win_av_eps_path <- paste0('C:/Users/aljackson/Documents/Environments/py_yfinance/AV_EPS_Report_', date, '.csv')
+mac_av_eps_path <- paste0(mac_wd, 'AV_EPS_Report_', date, '.csv')
 
-av_eps <- read_csv(win_av_eps_path, col_types = cols(X1 = col_integer(), reportedDate = col_date(format = "%Y-%m-%d")))
+av_eps <- read_csv(mac_av_eps_path, col_types = cols(X1 = col_integer(), reportedDate = col_date(format = "%Y-%m-%d")))
 colnames(av_eps)[1] <- 'index'
 
 av_eps$unique_row <- paste0(av_eps$symbol, av_eps$index)
@@ -66,11 +66,10 @@ eps_final$eps_2020_09_yr_chg <- eps_final$`2020-09-30` - eps_final$`2019-09-30`
 
 # Read in AV Stock and Fundamentals data and merge it with transformed EPS dataframe above (eps_final)
 
-mac_av_stocks_path <- "~/Documents/Environments/stocks_env/AV_StocksFundamentals_Merged.csv"
-
+mac_av_stocks_path <- paste0(mac_wd, 'AV_Stocks&Fundamentals_Merged_', date, '.csv')
 win_av_stocks_path <- paste0('C:/Users/aljackson/Documents/Environments/py_yfinance/AV_Stocks&Fundamentals_Merged_', date, '.csv')
 
-av_stocks <- read_csv(win_av_stocks_path, col_types = cols(LatestQuarter = col_date(format = "%Y-%m-%d"), X1 = col_integer(), date = col_date(format = "%Y-%m-%d")))
+av_stocks <- read_csv(mac_av_stocks_path, col_types = cols(LatestQuarter = col_date(format = "%Y-%m-%d"), X1 = col_integer(), date = col_date(format = "%Y-%m-%d")))
 colnames(av_stocks)[1] <- 'Index'
 
 av_merged <- merge(av_stocks, eps_final, by.x = 'Symbol', by.y = 'symbol', all.x = TRUE)
