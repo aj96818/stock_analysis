@@ -11,17 +11,23 @@ library(tidyr)
 mac_wd = '/Users/alanjackson/Documents/Environments/stocks_env/'
 win_wd = 'C:/Users/aljackson/Documents/Environments/py_yfinance/'
   
-setwd(mac_wd)
+setwd(win_wd)
 
 
 # Read in AV EPS data and transform it from long format to wide format so each stock symbol has one record and it can be neatly joined to Stocks & Fundamentals dataframe.
 
 date <- '2020-12-30'
-win_av_eps_path <- paste0('C:/Users/aljackson/Documents/Environments/py_yfinance/AV_EPS_Report_', date, '.csv')
+win_av_eps_path <- paste0(win_wd, 'AV_EPS_Report_', date, '.csv')
 mac_av_eps_path <- paste0(mac_wd, 'AV_EPS_Report_', date, '.csv')
 
-av_eps <- read_csv(mac_av_eps_path, col_types = cols(X1 = col_integer(), reportedDate = col_date(format = "%Y-%m-%d")))
+mac_av_stocks_path <- paste0(mac_wd, 'AV_Stocks&Fundamentals_Merged_', date, '.csv')
+win_av_stocks_path <- paste0(win_wd, 'AV_Stocks&Fundamentals_Merged_', date, '.csv')
+
+av_eps <- read_csv(win_av_eps_path, col_types = cols(X1 = col_integer(), reportedDate = col_date(format = "%Y-%m-%d")))
+av_stocks <- read_csv(win_av_stocks_path, col_types = cols(LatestQuarter = col_date(format = "%Y-%m-%d"), X1 = col_integer(), date = col_date(format = "%Y-%m-%d")))
+
 colnames(av_eps)[1] <- 'index'
+colnames(av_stocks)[1] <- 'Index'
 
 av_eps$unique_row <- paste0(av_eps$symbol, av_eps$index)
 dupes<-av_eps[c('unique_row')]
@@ -66,11 +72,6 @@ eps_final$eps_2020_09_yr_chg <- eps_final$`2020-09-30` - eps_final$`2019-09-30`
 
 # Read in AV Stock and Fundamentals data and merge it with transformed EPS dataframe above (eps_final)
 
-mac_av_stocks_path <- paste0(mac_wd, 'AV_Stocks&Fundamentals_Merged_', date, '.csv')
-win_av_stocks_path <- paste0('C:/Users/aljackson/Documents/Environments/py_yfinance/AV_Stocks&Fundamentals_Merged_', date, '.csv')
-
-av_stocks <- read_csv(mac_av_stocks_path, col_types = cols(LatestQuarter = col_date(format = "%Y-%m-%d"), X1 = col_integer(), date = col_date(format = "%Y-%m-%d")))
-colnames(av_stocks)[1] <- 'Index'
 
 av_merged <- merge(av_stocks, eps_final, by.x = 'Symbol', by.y = 'symbol', all.x = TRUE)
 
@@ -86,6 +87,9 @@ av_merge_split <- av_merge_split[1:3]
 # https://www.youtube.com/watch?v=L1J3M9jEWvQ
 
 VMAP_func <- function(df){
+  df <- df %>%
+    mutate(adj_close_lag0 = `adj close`,
+           adj_close_lag1 = lag(`adj close`, n = 1, order_by = date))
   df <- df %>%
     mutate(avg_price_lag0 = avg_price,
            avg_price_lag1 = lag(avg_price, n = 1, order_by = date),
@@ -119,9 +123,79 @@ av_merge_split <- lapply(av_merge_split, VMAP_func)
 
 av_merged <- ldply(av_merge_split, data.frame)
 
-sq <- av_merged[av_merged$symbol == 'SQ',]
-# write_csv(test, 'test_lag44.csv')
+av_merged$adjclose_wkly_pct_chg <- (av_merged$adj_close_lag0 - av_merged$adj_close_lag1) / av_merged$adj_close_lag1 
 
+
+
+#write_csv(av_merged, 'av_merged.csv')
+
+
+sq <- av_merged[av_merged$symbol == 'AA',]
+
+
+
+p = ggplot() + 
+  geom_line(data = sq, aes(x = date, y = close_wkly_pct_chg), color = "blue") +
+  #geom_hline(yintercept = max(sq$adj.close)) +
+  xlab('Dates') +
+  ylab('Weekly Close Pct Chg')
+
+
+p3 = ggplot() + 
+  geom_line(data = sq, aes(x = date, y = adj.close), color = 'purple') +
+  xlab('Dates') +
+  ylab('Adj Close')
+
+#print(p)
+
+install.packages('gtable')
+library(gtable)
+library(grid)
+g2 <- ggplotGrob(p)
+g3 <- ggplotGrob(p3)
+g <- rbind(g2, g3, size = "first")
+#g$widths <- unit.pmax(g2$widths, g3$widths)
+#grid.newpage()
+#grid.draw(g)
+
+grid.draw(g)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# write_csv(test, 'test_lag44.csv')
 
 p = ggplot() + 
   geom_line(data = sq, aes(x = date, y = `adj.close`), color = "blue") +
