@@ -81,12 +81,14 @@ av_merged$AvgPriceXVol <- av_merged$avg_price * av_merged$volume
 av_merge_split <- split(av_merged, av_merged$symbol)
 
 # Extract of full list to test following function on:
-av_merge_split <- av_merge_split[1:3]
+#av_merge_split <- av_merge_split[1:3]
 
 
 # https://www.youtube.com/watch?v=L1J3M9jEWvQ
 
 VMAP_func <- function(df){
+  df <- df %>%
+    mutate(first_adj_close = first(`adj close`, order_by = date))
   df <- df %>%
     mutate(adj_close_lag0 = `adj close`,
            adj_close_lag1 = lag(`adj close`, n = 1, order_by = date))
@@ -120,19 +122,41 @@ VMAP_func <- function(df){
 }
 
 av_merge_split <- lapply(av_merge_split, VMAP_func)
-
 av_merged <- ldply(av_merge_split, data.frame)
-
-av_merged$adjclose_wkly_pct_chg <- (av_merged$adj_close_lag0 - av_merged$adj_close_lag1) / av_merged$adj_close_lag1 
-
-
-
-#write_csv(av_merged, 'av_merged.csv')
+av_merged$AdjClose_CumPctChg <- (av_merged$adj.close - av_merged$first_adj_close) / av_merged$first_adj_close
+#length(which(av_merged$first_adj_close == 0))
 
 
-sq <- av_merged[av_merged$symbol == 'AA',]
+# omit market cap values of 'NA' from entire data set before piping to dplyr summarize function
+
+av_merged <- av_merged[!is.na(av_merged$MarketCapitalization), ]
 
 
+out <- arrange(av_merged, symbol, date) %>%
+  group_by(symbol) %>%
+  summarize(CumPctChg = last(AdjClose_CumPctChg),
+            Volume = mean(volume),
+            max(MarketCapitalization, na.rm=T))
+            
+
+write_csv(out, 'out.csv')
+
+
+
+
+
+
+pivot_weekly_chg_pct <- av_merged %>% 
+  group_by(Symbol, max(date)) %>% 
+  summarise(max(MarketCapitalization, na.rm=T))
+
+
+write_csv(pivot_weekly_chg_pct, 'pivot_weekly_total_change3.csv')
+
+
+sq <- av_merged[av_merged$symbol == 'TSLA',]
+
+write_csv(sq, 'tsla_stock3.csv')
 
 p = ggplot() + 
   geom_line(data = sq, aes(x = date, y = close_wkly_pct_chg), color = "blue") +
