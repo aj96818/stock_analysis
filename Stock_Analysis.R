@@ -13,7 +13,6 @@ win_wd = 'C:/Users/aljackson/Documents/Environments/py_yfinance/'
   
 setwd(win_wd)
 
-
 # Read in AV EPS data and transform it from long format to wide format so each stock symbol has one record and it can be neatly joined to Stocks & Fundamentals dataframe.
 
 date <- '2020-12-30'
@@ -78,6 +77,10 @@ av_merged <- merge(av_stocks, eps_final, by.x = 'Symbol', by.y = 'symbol', all.x
 av_merged$avg_price <- (av_merged$high + av_merged$`adj close` + av_merged$low) / 3
 av_merged$AvgPriceXVol <- av_merged$avg_price * av_merged$volume
 
+# keep only last 3 years of data
+
+av_merged <- av_merged[(av_merged$date >= '2018-01-01'), ]
+
 av_merge_split <- split(av_merged, av_merged$symbol)
 
 # Extract of full list to test following function on:
@@ -124,22 +127,36 @@ VMAP_func <- function(df){
 av_merge_split <- lapply(av_merge_split, VMAP_func)
 av_merged <- ldply(av_merge_split, data.frame)
 av_merged$AdjClose_CumPctChg <- (av_merged$adj.close - av_merged$first_adj_close) / av_merged$first_adj_close
+av_merged$AdjClose_LowerBB_Diff <- av_merged$adj.close - av_merged$Lower_BB
+
 #length(which(av_merged$first_adj_close == 0))
-
-
 # omit market cap values of 'NA' from entire data set before piping to dplyr summarize function
 
 av_merged <- av_merged[!is.na(av_merged$MarketCapitalization), ]
 
 
-out <- arrange(av_merged, symbol, date) %>%
-  group_by(symbol) %>%
-  summarize(CumPctChg = last(AdjClose_CumPctChg),
-            Volume = mean(volume),
-            max(MarketCapitalization, na.rm=T))
-            
 
-write_csv(out, 'out.csv')
+out1 <- arrange(av_merged, symbol, date) %>%
+  group_by(symbol) %>%
+  summarize(AdjClose_Diff = last(AdjClose_LowerBB_Diff),
+            Date = last(date))
+
+
+out2 <- arrange(av_merged, symbol, date) %>%
+  group_by(symbol, Industry, QuarterlyEarningsGrowthYOY) %>%
+  summarize(CumPctChg = last(AdjClose_CumPctChg),
+            Avg_Vol = mean(volume),
+            Last_AdjClose = last(`adj.close`),
+            Cnt_of_Records = n(),
+            Max_Mkt_Cap = max(MarketCapitalization, na.rm=T))
+
+
+
+out3 <- merge(out1, out2, by.x = 'symbol', by.y = 'symbol', all.x = T)
+
+
+out3 <- out3[out3$Max_Mkt_Cap > 1000000000,]
+write_csv(out3, 'out8.csv')
 
 
 
@@ -154,9 +171,9 @@ pivot_weekly_chg_pct <- av_merged %>%
 write_csv(pivot_weekly_chg_pct, 'pivot_weekly_total_change3.csv')
 
 
-sq <- av_merged[av_merged$symbol == 'TSLA',]
+sq <- av_merged[av_merged$symbol == 'BUR',]
 
-write_csv(sq, 'tsla_stock3.csv')
+write_csv(sq, 'bur_stock.csv')
 
 p = ggplot() + 
   geom_line(data = sq, aes(x = date, y = close_wkly_pct_chg), color = "blue") +
