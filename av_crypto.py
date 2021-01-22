@@ -9,7 +9,7 @@ import json
 
 startTime = time.time()
 
-crypto = ['BTC', 'ETH', 'ZRX', 'BAL', 'BAT', 'BCH', 'KNC', 'LSK', 'IOTA', 'MRPH', 'NEO', 'ONT', 'DOT', 'POWR', 'REN', 'XLM', 'UBT', 'WPR']
+crypto = ['LINK', 'BTC', 'ETH', 'ZRX', 'BAL', 'BAT', 'BCH', 'KNC', 'LSK', 'IOTA', 'MRPH', 'NEO', 'ONT', 'DOT', 'POWR', 'REN', 'XLM', 'UBT', 'WPR']
 
 df_list = []
 for ticker in crypto:

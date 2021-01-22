@@ -15,7 +15,7 @@ setwd(win_wd)
 
 # Read in AV EPS data and transform it from long format to wide format so each stock symbol has one record and it can be neatly joined to Stocks & Fundamentals dataframe.
 
-date <- '2020-12-30'
+date <- '2021-01-20'
 win_av_eps_path <- paste0(win_wd, 'AV_EPS_Report_', date, '.csv')
 mac_av_eps_path <- paste0(mac_wd, 'AV_EPS_Report_', date, '.csv')
 
@@ -143,7 +143,7 @@ out1 <- arrange(av_merged, symbol, date) %>%
 
 
 out2 <- arrange(av_merged, symbol, date) %>%
-  group_by(symbol, Industry, QuarterlyEarningsGrowthYOY) %>%
+  group_by(symbol, Sector, Industry, QuarterlyEarningsGrowthYOY) %>%
   summarize(CumPctChg = last(AdjClose_CumPctChg),
             Avg_Vol = mean(volume),
             Last_AdjClose = last(`adj.close`),
@@ -156,7 +156,7 @@ out3 <- merge(out1, out2, by.x = 'symbol', by.y = 'symbol', all.x = T)
 
 
 out3 <- out3[out3$Max_Mkt_Cap > 1000000000,]
-write_csv(out3, 'out8.csv')
+write_csv(out3, paste0('out_',date, '.csv' ))
 
 
 
