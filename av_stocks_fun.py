@@ -77,7 +77,7 @@ for ticker in unique_tickers:
 		
 		x = json.dumps(response_json)
 		d = json.loads(x)
-		e = d['quarterlyEarnings'][:5]
+		e = d['quarterlyEarnings'][:13]
 		
 		for dic in e:
 			df = pd.DataFrame.from_dict(dic, orient = 'index')
